@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>For Cam Tu ❤️</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+}
+
+body{
+    overflow:hidden;
+    background:linear-gradient(
+        135deg,
+        #fff5f8 0%,
+        #ffe6f0 50%,
+        #ffd6e7 100%
+    );
+}
+
+canvas{
+    position:absolute;
+    inset:0;
+}
+
+.message{
+    position:absolute;
+    width:100%;
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-50%);
+    text-align:center;
+    pointer-events:none;
+}
+
+.message h1{
+    font-size:90px;
+    color:rgba(255,255,255,0.15);
+    font-family:Arial,sans-serif;
+    letter-spacing:12px;
+
+    text-shadow:
+        0 0 10px white,
+        0 0 30px #ff9ec4,
+        0 0 60px #ff9ec4;
+}
+</style>
+</head>
+<body>
+
+<canvas id="canvas"></canvas>
+
+<!-- <div class="message">
+    <h1>I LOVE YOU</h1>
+</div> -->
+
+<script>
+
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+
+canvas.width = innerWidth;
+canvas.height = innerHeight;
+
+const particles = [];
+const particleCount = 1200;
+
+const textCanvas = document.createElement("canvas");
+const textCtx = textCanvas.getContext("2d");
+
+textCanvas.width = canvas.width;
+textCanvas.height = canvas.height;
+
+textCtx.fillStyle = "white";
+textCtx.font = "bold 140px Arial";
+textCtx.textAlign = "center";
+textCtx.fillText(
+    "I LOVE YOU",
+    canvas.width/2,
+    canvas.height/2
+);
+
+const data = textCtx.getImageData(
+    0,
+    0,
+    canvas.width,
+    canvas.height
+);
+
+const targets = [];
+
+for(let y=0; y<data.height; y+=6){
+    for(let x=0; x<data.width; x+=6){
+
+        const alpha =
+        data.data[(y*data.width+x)*4+3];
+
+        if(alpha > 128){
+            targets.push({x,y});
+        }
+    }
+}
+
+class Particle{
+
+    constructor(target){
+
+        this.x = Math.random()*canvas.width;
+        this.y = Math.random()*canvas.height;
+
+        this.tx = target.x;
+        this.ty = target.y;
+
+        this.size = Math.random()*2+1;
+    }
+
+    update(){
+
+        this.x += (this.tx-this.x)*0.03;
+        this.y += (this.ty-this.y)*0.03;
+    }
+
+    draw(){
+
+        ctx.beginPath();
+
+        ctx.arc(
+            this.x,
+            this.y,
+            this.size,
+            0,
+            Math.PI*2
+        );
+
+        ctx.fillStyle="rgba(255,255,255,0.95)";
+        ctx.shadowBlur=15;
+        ctx.shadowColor="#ff8fb8";
+
+        ctx.fill();
+    }
+}
+
+for(let i=0;i<particleCount;i++){
+
+    const target =
+    targets[Math.floor(Math.random()*targets.length)];
+
+    particles.push(
+        new Particle(target)
+    );
+}
+
+function animate(){
+
+    ctx.clearRect(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
+
+    particles.forEach(p=>{
+        p.update();
+        p.draw();
+    });
+
+    requestAnimationFrame(animate);
+}
+
+animate();
+
+window.addEventListener("resize",()=>{
+    location.reload();
+});
+
+</script>
+
+</body>
+</html>
